@@ -19,7 +19,7 @@ public class LoginPage extends JFrame {
 	private JPanel contentPane;
 	private JTextField nameTxt;
 	private JTextField passTxt;
-
+    private LoginPage login = this;
 	/**
 	 * Launch the application.
 	 */
@@ -78,6 +78,10 @@ public class LoginPage extends JFrame {
 		JButton btnNewButton = new JButton("Log in");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				UserInterface user = new UserInterface();
+				user.setVisible(true);
+				login.setVisible(false);
+				
 			}
 		});
 		btnNewButton.setBackground(new Color(240, 240, 240));
