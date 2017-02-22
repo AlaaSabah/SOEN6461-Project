@@ -75,7 +75,7 @@ public class UserInterface extends JFrame implements Observer{
 		JPanel dataPanel = new JPanel();
 		tabbedPane.addTab("Historical Data", dataPanel);
 		contentPane.add(tabbedPane);
-		JPanel chartPanel = new JPanel();
+		final JPanel chartPanel = new JPanel();
 		tabbedPane.addTab("Chart", chartPanel);
 		
 		JPanel readpanel = new JPanel();
@@ -193,6 +193,14 @@ public class UserInterface extends JFrame implements Observer{
 		panel.add(editbtn);
 		
 		JButton drawbtn = new JButton("Draw");
+		drawbtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+                chartPanel.removeAll();
+				chartPanel.add(controller.drawStock(model.getCurrentStock(),0), BorderLayout.CENTER);
+				chartPanel.validate();
+				
+			}
+		});
 		drawbtn.setFont(new Font("Tahoma", Font.BOLD, 12));
 		drawbtn.setBounds(53, 547, 89, 38);
 		contentPane.add(drawbtn);

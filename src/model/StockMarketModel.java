@@ -8,6 +8,7 @@ public class StockMarketModel extends Observable{
 	
 	private ArrayList<Stock> stocks;
 	private ArrayList<Observer> observers;
+	private String currentstock;
 	
 	public StockMarketModel(){
 		stocks = new ArrayList<Stock>();
@@ -20,7 +21,14 @@ public class StockMarketModel extends Observable{
 	
 	public void addStock(Stock s){
 		stocks.add(s);
+		if(stocks.size()==1){
+			currentstock = s.getName();
+		}
 		notifyView();
+	}
+	
+	public String getCurrentStock(){
+		return currentstock;
 	}
 	
 	public Stock getStock(String StockName){

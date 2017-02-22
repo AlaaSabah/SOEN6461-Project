@@ -9,6 +9,8 @@ import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import org.jfree.chart.ChartPanel;
+
 import model.Stock;
 import model.StockMarketModel;
 import view.LoginPage;
@@ -19,12 +21,14 @@ public class Controller {
 	private LoginPage login;
 	private StockMarketModel model;
 	private DataReader reader;
+	private ChartDrawer drawer;
 	UserInterface user;
 	
 	public Controller(LoginPage login, StockMarketModel model){
 		
 		this.login = login;
 		this.model = model;
+		drawer = new ChartDrawer();
 		
 	}
 	
@@ -71,4 +75,13 @@ public class Controller {
 			}
 		}
 	}
+
+
+	public ChartPanel drawStock(String stockName, int range){
+	
+		return drawer.draw(model.getStock(stockName), range);
+
+
+	}
+
 }
