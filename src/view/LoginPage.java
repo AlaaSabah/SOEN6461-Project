@@ -5,7 +5,12 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import controller.Controller;
+import model.StockMarketModel;
+
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import java.awt.Font;
 import java.awt.Color;
@@ -13,13 +18,17 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.SwingConstants;
 
 public class LoginPage extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField nameTxt;
 	private JTextField passTxt;
-    private LoginPage login = this;
+	private LoginPage login = this ;
+    private Controller controller;
+    private StockMarketModel model;
+
 	/**
 	 * Launch the application.
 	 */
@@ -35,6 +44,14 @@ public class LoginPage extends JFrame {
 			}
 		});
 	}
+	
+	public void addController(Controller c){
+		controller = c;
+	}
+	
+	public void addModel(StockMarketModel m){
+		model = m;
+	}
 
 	/**
 	 * Create the frame.
@@ -42,7 +59,7 @@ public class LoginPage extends JFrame {
 	public LoginPage() {
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 604, 418);
+		setBounds(100, 100, 604, 400);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -72,16 +89,24 @@ public class LoginPage extends JFrame {
 		
 		JLabel lblNewLabel_3 = new JLabel("");
 		lblNewLabel_3.setIcon(new ImageIcon("C:\\Users\\alaa\\Desktop\\Master\\EclipseProjects\\SOEN6461Project\\src\\images\\login 3.png"));
-		lblNewLabel_3.setBounds(286, 11, 233, 236);
+		lblNewLabel_3.setBounds(10, 74, 416, 252);
 		contentPane.add(lblNewLabel_3);
 		
 		JButton btnNewButton = new JButton("Log in");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				UserInterface user = new UserInterface();
-				user.setVisible(true);
-				login.setVisible(false);
-				
+				boolean b = controller.authorizeUser(nameTxt.getText(), passTxt.getText());
+				if(b){
+					UserInterface user = new UserInterface();
+					user.addControllerandModel(controller,model);
+					
+					controller.addUserInterface(user);
+					user.setVisible(true);
+					login.setVisible(false);
+				}
+				else{
+					JOptionPane.showMessageDialog(null, "Error name or password !!","Unauthorized user", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		btnNewButton.setBackground(new Color(240, 240, 240));
@@ -89,9 +114,21 @@ public class LoginPage extends JFrame {
 		btnNewButton.setBounds(411, 328, 89, 23);
 		contentPane.add(btnNewButton);
 		
+		JLabel label = new JLabel("Stock Market Analyst");
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+		label.setForeground(new Color(139, 0, 0));
+		label.setFont(new Font("Castellar", Font.BOLD | Font.ITALIC, 30));
+		label.setBounds(50, 11, 478, 62);
+		contentPane.add(label);
+		
+		JLabel label_1 = new JLabel("");
+		label_1.setIcon(new ImageIcon("C:\\Users\\alaa\\Desktop\\Master\\EclipseProjects\\SOEN6461Project\\src\\images\\logo 5.png"));
+		label_1.setBounds(471, 97, 100, 100);
+		contentPane.add(label_1);
+		
 		JLabel lblNewLabel = new JLabel("");
-		lblNewLabel.setIcon(new ImageIcon("C:\\Users\\alaa\\Desktop\\Master\\EclipseProjects\\SOEN6461Project\\src\\images\\login background.jpg"));
-		lblNewLabel.setBounds(0, 0, 588, 379);
+		lblNewLabel.setIcon(new ImageIcon("C:\\Users\\alaa\\Desktop\\Master\\EclipseProjects\\SOEN6461Project\\src\\images\\bg 8.jpg"));
+		lblNewLabel.setBounds(0, 0, 598, 389);
 		contentPane.add(lblNewLabel);
 	}
 }

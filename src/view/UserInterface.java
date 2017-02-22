@@ -14,18 +14,33 @@ import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import java.awt.Font;
 import javax.swing.border.TitledBorder;
+
+import controller.Controller;
+import model.StockMarketModel;
+
 import java.awt.Color;
 import javax.swing.UIManager;
 import java.awt.event.ActionListener;
+import java.util.Observable;
+import java.util.Observer;
 import java.awt.event.ActionEvent;
 import javax.swing.JRadioButton;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingConstants;
 
-public class UserInterface extends JFrame {
+public class UserInterface extends JFrame implements Observer{
 
 	private JPanel contentPane;
+	private Controller controller;
+	private StockMarketModel model;
+	private JComboBox stockName;
+	
+	public void addControllerandModel(Controller c, StockMarketModel m){
+		controller = c;
+		model = m;
+		model.addObservers(this);
+	}
 
 	/**
 	 * Launch the application.
@@ -70,21 +85,23 @@ public class UserInterface extends JFrame {
 		readpanel.setOpaque(false);
 		contentPane.add(readpanel);
 		
+		final JRadioButton csvFile = new JRadioButton("CSV File");
+		csvFile.setOpaque(false);
+		csvFile.setSelected(true);
+		csvFile.setBounds(6, 27, 75, 23);
+		readpanel.add(csvFile);
+		
 		JButton readbtn = new JButton("Get Data");
 		readbtn.setBounds(53, 68, 81, 23);
 		readbtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				controller.readData(csvFile.isSelected());
 			}
 		});
 		readpanel.setLayout(null);
 		readpanel.add(readbtn);
 		readbtn.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
-		JRadioButton csvFile = new JRadioButton("CSV File");
-		csvFile.setOpaque(false);
-		csvFile.setSelected(true);
-		csvFile.setBounds(6, 27, 75, 23);
-		readpanel.add(csvFile);
 		
 		JPanel settingpanel = new JPanel();
 		settingpanel.setBorder(new TitledBorder(border, "Settings", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 0, 0)));
@@ -108,7 +125,7 @@ public class UserInterface extends JFrame {
 		lblStock.setBounds(20, 23, 46, 17);
 		settingpanel.add(lblStock);
 		
-		JComboBox stockName = new JComboBox();
+		stockName = new JComboBox();
 		stockName.setBounds(76, 22, 89, 20);
 		settingpanel.add(stockName);
 		
@@ -202,5 +219,13 @@ public class UserInterface extends JFrame {
 		lblNewLabel.setIcon(new ImageIcon("C:\\Users\\alaa\\Desktop\\Master\\EclipseProjects\\SOEN6461Project\\src\\images\\bg 8.jpg"));
 		lblNewLabel.setBounds(0, 0, 977, 601);
 		contentPane.add(lblNewLabel);
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+
+		String[] stocksNames = model.getStocksNames();
+		stockName.setModel(new DefaultComboBoxModel(stocksNames));
+		
 	}
 }

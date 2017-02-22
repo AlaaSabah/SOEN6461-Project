@@ -9,8 +9,10 @@ public class Launcher {
 	public static void main(String[] args) {
 		
 		LoginPage login = new LoginPage();
-		Controller controller = new Controller();
 		StockMarketModel model = new StockMarketModel();
+		Controller controller = new Controller(login,model);
+		login.addController(controller);
+		login.addModel(model);
 		login.setVisible(true);
 
 	}
