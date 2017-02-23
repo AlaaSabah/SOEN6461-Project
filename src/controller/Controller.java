@@ -77,11 +77,21 @@ public class Controller {
 	}
 
 
-	public ChartPanel drawStock(String stockName, int range){
+	public ChartPanel drawStock(int selection){
 	
-		return drawer.draw(model.getStock(stockName), range);
-
-
+		int range=0;
+		switch(selection){
+		case 0 : range = -1;break;
+		case 1 : range = 3;break;
+		case 2 : range = 6;break;
+		case 3 : range = 1; break;
+		case 4 : range = 2;break;
+		}
+		
+		return drawer.draw(model.getStock(model.getCurrentStock()), range);
 	}
 
+	public void changeCurrentStock(String name){
+		model.setCurrentStock(name);
+	}
 }

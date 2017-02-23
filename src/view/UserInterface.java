@@ -35,6 +35,7 @@ public class UserInterface extends JFrame implements Observer{
 	private Controller controller;
 	private StockMarketModel model;
 	private JComboBox stockName;
+	private JLabel currentStock;
 	
 	public void addControllerandModel(Controller c, StockMarketModel m){
 		controller = c;
@@ -126,6 +127,12 @@ public class UserInterface extends JFrame implements Observer{
 		settingpanel.add(lblStock);
 		
 		stockName = new JComboBox();
+		stockName.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.changeCurrentStock(stockName.getSelectedItem().toString());
+				currentStock.setText(model.getCurrentStock());
+			}
+		});
 		stockName.setBounds(76, 22, 89, 20);
 		settingpanel.add(stockName);
 		
@@ -134,8 +141,8 @@ public class UserInterface extends JFrame implements Observer{
 		lblNewLabel_1.setBounds(20, 62, 81, 14);
 		settingpanel.add(lblNewLabel_1);
 		
-		JComboBox range = new JComboBox();
-		range.setModel(new DefaultComboBoxModel(new String[] {"3 months", "6 months", "1 year", "2 years"}));
+		final JComboBox range = new JComboBox();
+		range.setModel(new DefaultComboBoxModel(new String[] {"All", "3 months", "6 months", "1 year", "2 years"}));
 		range.setBounds(96, 60, 69, 20);
 		settingpanel.add(range);
 		
@@ -196,7 +203,7 @@ public class UserInterface extends JFrame implements Observer{
 		drawbtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
                 chartPanel.removeAll();
-				chartPanel.add(controller.drawStock(model.getCurrentStock(),0), BorderLayout.CENTER);
+				chartPanel.add(controller.drawStock(range.getSelectedIndex()), BorderLayout.CENTER);
 				chartPanel.validate();
 				
 			}
@@ -205,7 +212,7 @@ public class UserInterface extends JFrame implements Observer{
 		drawbtn.setBounds(53, 547, 89, 38);
 		contentPane.add(drawbtn);
 		
-		JLabel currentStock = new JLabel("Current Stock");
+		currentStock = new JLabel("Current Stock");
 		currentStock.setHorizontalAlignment(SwingConstants.CENTER);
 		currentStock.setFont(new Font("Tahoma", Font.BOLD, 14));
 		currentStock.setBounds(510, 558, 167, 43);
@@ -234,6 +241,7 @@ public class UserInterface extends JFrame implements Observer{
 
 		String[] stocksNames = model.getStocksNames();
 		stockName.setModel(new DefaultComboBoxModel(stocksNames));
+		currentStock.setText(model.getCurrentStock());
 		
 	}
 }

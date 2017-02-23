@@ -22,13 +22,17 @@ public class StockMarketModel extends Observable{
 	public void addStock(Stock s){
 		stocks.add(s);
 		if(stocks.size()==1){
-			currentstock = s.getName();
+			setCurrentStock(s.getName());
 		}
 		notifyView();
 	}
 	
 	public String getCurrentStock(){
 		return currentstock;
+	}
+	
+	public void setCurrentStock(String name){
+		currentstock = name;
 	}
 	
 	public Stock getStock(String StockName){
