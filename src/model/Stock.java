@@ -39,5 +39,9 @@ public class Stock {
 	public MovingAverage getMA(int index){
 		return movingAverages.get(index);
 	}
+	
+	public void addMA(MovingAverage ma){
+		movingAverages.add(ma);
+	}
 
 }

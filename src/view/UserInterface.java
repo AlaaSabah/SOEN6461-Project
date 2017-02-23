@@ -12,6 +12,8 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
+
 import java.awt.Font;
 import javax.swing.border.TitledBorder;
 
@@ -28,6 +30,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingConstants;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class UserInterface extends JFrame implements Observer{
 
@@ -158,7 +162,7 @@ public class UserInterface extends JFrame implements Observer{
 		lblMethod.setBounds(10, 29, 53, 14);
 		panel.add(lblMethod);
 		
-		JComboBox maMethod = new JComboBox();
+		final JComboBox maMethod = new JComboBox();
 		maMethod.setModel(new DefaultComboBoxModel(new String[] {"Simple MA"}));
 		maMethod.setBounds(64, 26, 73, 20);
 		panel.add(maMethod);
@@ -168,7 +172,7 @@ public class UserInterface extends JFrame implements Observer{
 		lblPeriod.setBounds(10, 64, 46, 14);
 		panel.add(lblPeriod);
 		
-		JComboBox maPeriod = new JComboBox();
+		final JComboBox maPeriod = new JComboBox();
 		maPeriod.setModel(new DefaultComboBoxModel(new String[] {"20", "50", "100", "200"}));
 		maPeriod.setBounds(74, 61, 63, 20);
 		panel.add(maPeriod);
@@ -178,7 +182,15 @@ public class UserInterface extends JFrame implements Observer{
 		lblColor.setBounds(10, 100, 46, 20);
 		panel.add(lblColor);
 		
-		JLabel maColor = new JLabel("");
+		final JLabel maColor = new JLabel("");
+		maColor.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				Color c = JColorChooser.showDialog(null, "Choose a Color", maColor.getBackground());
+			    if (c != null)
+			      maColor.setBackground(c);
+			}
+		});
 		maColor.setForeground(new Color(0, 0, 0));
 		maColor.setOpaque(true);
 		maColor.setBackground(Color.MAGENTA);
@@ -186,6 +198,11 @@ public class UserInterface extends JFrame implements Observer{
 		panel.add(maColor);
 		
 		JButton addbtn = new JButton("Add");
+		addbtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.addMA(maMethod.getSelectedIndex(), Integer.parseInt(maPeriod.getSelectedItem().toString()), maColor.getBackground());
+			}
+		});
 		addbtn.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		addbtn.setBounds(10, 131, 53, 23);
 		panel.add(addbtn);

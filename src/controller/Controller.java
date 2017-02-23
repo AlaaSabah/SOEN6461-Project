@@ -1,5 +1,6 @@
 package controller;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import javax.swing.JOptionPane;
 
 import org.jfree.chart.ChartPanel;
 
+import model.MovingAverage;
 import model.Stock;
 import model.StockMarketModel;
 import view.LoginPage;
@@ -22,6 +24,7 @@ public class Controller {
 	private StockMarketModel model;
 	private DataReader reader;
 	private ChartDrawer drawer;
+	private MACalculator maCalculator;
 	UserInterface user;
 	
 	public Controller(LoginPage login, StockMarketModel model){
@@ -94,4 +97,13 @@ public class Controller {
 	public void changeCurrentStock(String name){
 		model.setCurrentStock(name);
 	}
+
+	public void addMA(int selection, int period , Color c){
+		if(selection == 0){
+			maCalculator = new SimpleMACalculator();
+		}
+		MovingAverage ma =  maCalculator.calculate(model.getStock(model.getCurrentStock()), period, c);
+		model.getStock(model.getCurrentStock()).addMA(ma);
+	}
+
 }

@@ -25,7 +25,7 @@ public DefaultCategoryDataset createDataset(Stock s, int range){
 		
 		for(int i=1 ; i<a.size() ; i++){
 			if(compareDates(base, ((String[])a.get(i))[0]))
-			dataset.addValue(Double.parseDouble(((String[])a.get(i))[4]), s.getName(), ((String[])a.get(i))[0]);
+				dataset.addValue(Double.parseDouble(((String[])a.get(i))[4]), s.getName(), ((String[])a.get(i))[0]);
 			else
 				break;
 		}
@@ -35,7 +35,10 @@ public DefaultCategoryDataset createDataset(Stock s, int range){
 			for(int i=0 ; i<s.numOfCharts()-1 ; i++){
 				d = s.getMA(i).getData();
 				for(int j=0 ; j<d.size() ; j++)
-				dataset.addValue(Double.parseDouble(((String[])a.get(i))[1]), "MA#"+(i+1), ((String[])a.get(i))[0]);
+					if(compareDates(base, ((String[])d.get(j))[0]))
+						dataset.addValue(Double.parseDouble(((String[])d.get(j))[1]), "MA#"+(i+1), ((String[])d.get(j))[0]);
+					else
+						break;
 			}
 		}
 		return dataset;
@@ -55,7 +58,7 @@ public DefaultCategoryDataset createDataset(Stock s){
 		for(int i=0 ; i<s.numOfCharts()-1 ; i++){
 			d = s.getMA(i).getData();
 			for(int j=0 ; j<d.size() ; j++)
-			dataset.addValue(Double.parseDouble(((String[])a.get(i))[1]), "MA#"+(i+1), ((String[])a.get(i))[0]);
+			dataset.addValue(Double.parseDouble(((String[])d.get(j))[1]), "MA#"+(i+1), ((String[])d.get(j))[0]);
 		}
 	}
 	return dataset;
