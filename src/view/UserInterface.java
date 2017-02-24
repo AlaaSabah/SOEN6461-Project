@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -20,6 +21,7 @@ import java.awt.GridLayout;
 
 import javax.swing.border.TitledBorder;
 
+import org.jfree.chart.ChartPanel;
 
 import controller.Controller;
 import model.MovingAverage;
@@ -49,6 +51,7 @@ public class UserInterface extends JFrame implements Observer{
 	private JComboBox stockName;
 	private JLabel currentStock;
 	private JComboBox maBox;
+	JPanel dataPanel;
 	
 	public void addControllerandModel(Controller c, StockMarketModel m){
 		controller = c;
@@ -86,11 +89,14 @@ public class UserInterface extends JFrame implements Observer{
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(230, 82, 727, 473);
-		JPanel dataPanel = new JPanel();
+		dataPanel = new JPanel();
 		tabbedPane.addTab("Historical Data", dataPanel);
+		dataPanel.setLayout(new BorderLayout());
 		contentPane.add(tabbedPane);
 		final JPanel chartPanel = new JPanel();
 		tabbedPane.addTab("Chart", chartPanel);
+		JTable table = new JTable(30,7);
+		dataPanel.add(table);
 		
 		JPanel readpanel = new JPanel();
 		LineBorder border = new LineBorder ( Color.BLACK, 2, true );
@@ -235,7 +241,7 @@ public class UserInterface extends JFrame implements Observer{
 				txt.setText(s);
 				JScrollPane sp = new JScrollPane(txt);
 				sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-				prediction.add(sp);
+				prediction.getContentPane().add(sp);
 				prediction.setVisible(true);
 			}
 		});
@@ -248,9 +254,13 @@ public class UserInterface extends JFrame implements Observer{
 		JButton drawbtn = new JButton("Draw");
 		drawbtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-                chartPanel.removeAll();
-				chartPanel.add(controller.drawStock(range.getSelectedIndex()), BorderLayout.CENTER);
-				chartPanel.validate();
+				ChartPanel c = controller.drawStock(range.getSelectedIndex());
+				if(c != null){
+					 chartPanel.removeAll();
+					 chartPanel.add(controller.drawStock(range.getSelectedIndex()), BorderLayout.CENTER);
+					 chartPanel.validate();
+				}
+               
 				
 			}
 		});
@@ -289,6 +299,7 @@ public class UserInterface extends JFrame implements Observer{
 			String[] stocksNames = model.getStocksNames();
 			stockName.setModel(new DefaultComboBoxModel(stocksNames));
 			
+			
 		}else if(o instanceof Stock){ // change current stock
 			currentStock.setText(model.getCurrentStock());
 			ArrayList<MovingAverage> m = ((Stock) o).getMovingAverages();
@@ -297,6 +308,14 @@ public class UserInterface extends JFrame implements Observer{
 				maList[i] = "MA/"+m.get(i).getPeriod();
 			}
 			maBox.setModel(new DefaultComboBoxModel(maList));
+			String[][] data = new String[model.getStock(model.getCurrentStock()).getInfo().size()-1][7];
+			for(int i=1 ; i<model.getStock(model.getCurrentStock()).getInfo().size() ; i++){
+				data[i-1] = model.getStock(model.getCurrentStock()).getInfo().get(i); 
+			}
+			JTable table = new JTable(data, model.getStock(model.getCurrentStock()).getInfo().get(0));
+			dataPanel.removeAll();
+			dataPanel.add(new JScrollPane(table));
+			dataPanel.revalidate();
 		}
 		
 	}

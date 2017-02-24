@@ -91,8 +91,9 @@ public class Controller {
 		case 3 : range = 1; break;
 		case 4 : range = 2;break;
 		}
-		
+		if(model.getCurrentStock() != null)
 		return drawer.draw(model.getStock(model.getCurrentStock()), range);
+		return null;
 	}
 
 	public void changeCurrentStock(String name){
@@ -100,20 +101,29 @@ public class Controller {
 	}
 
 	public void addMA(int selection, int period , Color c){
-		if(selection == 0){
-			maCalculator = new SimpleMACalculator();
+		if(model.getCurrentStock() != null){
+			if(selection == 0){
+				maCalculator = new SimpleMACalculator();
+			}
+			MovingAverage ma =  maCalculator.calculate(model.getStock(model.getCurrentStock()), period, c);
+			model.getStock(model.getCurrentStock()).addMA(ma);
 		}
-		MovingAverage ma =  maCalculator.calculate(model.getStock(model.getCurrentStock()), period, c);
-		model.getStock(model.getCurrentStock()).addMA(ma);
+		
 	}
 
 	public void deletMA(int index){
+		if(index>=0)
 		model.getStock(model.getCurrentStock()).removeMA(index);
 	}
 	
 	public String findSellBuyPoints(){
-		maCalculator = new SimpleMACalculator();
-		String points = maCalculator.findSBPoints(model.getStock(model.getCurrentStock()));
-		return points;
+		if(model.getCurrentStock() != null){
+			if(model.getStock(model.getCurrentStock()).getMovingAverages().size() < 2)
+				return new String("Add MAs first. you should have two with different periods at least");
+			maCalculator = new SimpleMACalculator();
+			String points = maCalculator.findSBPoints(model.getStock(model.getCurrentStock()));
+			return points;
+		}
+		return new String("Nothing to display");
 	}
 }
