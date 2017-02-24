@@ -27,7 +27,7 @@ public class MovingAverage {
 		return data;
 	}
 	
-	public void getData(ArrayList<String[]> a){
+	public void setData(ArrayList<String[]> a){
 		data = a;
 	}
 

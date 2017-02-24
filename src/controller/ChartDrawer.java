@@ -22,23 +22,33 @@ public DefaultCategoryDataset createDataset(Stock s, int range){
 		DefaultCategoryDataset dataset= new DefaultCategoryDataset();
 		ArrayList<String[]> a = s.getInfo();
 		String base = calculateDateRange(range , ((String[])a.get(1))[0]);
-		
+		int index=0;
 		for(int i=1 ; i<a.size() ; i++){
 			if(compareDates(base, ((String[])a.get(i))[0]))
-				dataset.addValue(Double.parseDouble(((String[])a.get(i))[4]), s.getName(), ((String[])a.get(i))[0]);
+				index = i;
 			else
 				break;
 		}
+		
+		for(int i=index ; i>0 ; i--){
+			dataset.addValue(Double.parseDouble(((String[])a.get(i))[4]), s.getName(), ((String[])a.get(i))[0]);
+		}
+		
 		
 		if(s.numOfCharts()>1){
 			ArrayList<String[]> d;
 			for(int i=0 ; i<s.numOfCharts()-1 ; i++){
 				d = s.getMA(i).getData();
+				index=0;
 				for(int j=0 ; j<d.size() ; j++)
 					if(compareDates(base, ((String[])d.get(j))[0]))
-						dataset.addValue(Double.parseDouble(((String[])d.get(j))[1]), "MA#"+(i+1), ((String[])d.get(j))[0]);
+						index=j;
 					else
 						break;
+				
+				for(int j=index ; j>=0 ; j--){
+					dataset.addValue(Double.parseDouble(((String[])d.get(j))[1]), "MA#"+(i+1), ((String[])d.get(j))[0]);
+				}
 			}
 		}
 		return dataset;
@@ -49,7 +59,7 @@ public DefaultCategoryDataset createDataset(Stock s){
 	DefaultCategoryDataset dataset= new DefaultCategoryDataset();
 	ArrayList<String[]> a = s.getInfo();
 	
-	for(int i=1 ; i<a.size() ; i++){
+	for(int i=a.size()-1 ; i>0 ; i--){
 		dataset.addValue(Double.parseDouble(((String[])a.get(i))[4]), s.getName(), ((String[])a.get(i))[0]);
 	}
 	
@@ -57,7 +67,7 @@ public DefaultCategoryDataset createDataset(Stock s){
 		ArrayList<String[]> d;
 		for(int i=0 ; i<s.numOfCharts()-1 ; i++){
 			d = s.getMA(i).getData();
-			for(int j=0 ; j<d.size() ; j++)
+			for(int j=d.size()-1 ; j>=0 ; j--)
 			dataset.addValue(Double.parseDouble(((String[])d.get(j))[1]), "MA#"+(i+1), ((String[])d.get(j))[0]);
 		}
 	}
@@ -70,8 +80,8 @@ private String calculateDateRange(int range, String last) {
 	String[] date = last.split("-");
 	int y = Integer.parseInt(date[0]);
 	int m = Integer.parseInt(date[1]);
-	int newY=0;
-	int newM=0;
+	int newY=y;
+	int newM=m;
 	
 	if(range == 3){
 		newM = m-3;
@@ -98,7 +108,7 @@ private String calculateDateRange(int range, String last) {
 	}else{
 		first+=newY+"-"+newM+"-"+date[2];
 	}
-	
+
 	return first;
 }
 

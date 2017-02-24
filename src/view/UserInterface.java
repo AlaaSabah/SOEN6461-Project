@@ -11,22 +11,30 @@ import javax.swing.JLabel;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
 import java.awt.Font;
+import java.awt.GridLayout;
+
 import javax.swing.border.TitledBorder;
 
+
 import controller.Controller;
+import model.MovingAverage;
+import model.Stock;
 import model.StockMarketModel;
 
 import java.awt.Color;
 import javax.swing.UIManager;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.awt.event.ActionEvent;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingConstants;
@@ -40,6 +48,7 @@ public class UserInterface extends JFrame implements Observer{
 	private StockMarketModel model;
 	private JComboBox stockName;
 	private JLabel currentStock;
+	private JComboBox maBox;
 	
 	public void addControllerandModel(Controller c, StockMarketModel m){
 		controller = c;
@@ -115,15 +124,6 @@ public class UserInterface extends JFrame implements Observer{
 		settingpanel.setBounds(10, 195, 188, 341);
 		contentPane.add(settingpanel);
 		
-		JButton sellBuybtn = new JButton("Sell/Buy Data");
-		sellBuybtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		sellBuybtn.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		sellBuybtn.setBounds(42, 284, 110, 23);
-		settingpanel.add(sellBuybtn);
-		
 		JLabel lblStock = new JLabel("Stock");
 		lblStock.setBackground(new Color(192, 192, 192));
 		lblStock.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -153,7 +153,7 @@ public class UserInterface extends JFrame implements Observer{
 		JPanel panel = new JPanel();
 		panel.setOpaque(false);
 		panel.setBorder(new TitledBorder(null, "Moving Average", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 0, 0)));
-		panel.setBounds(20, 99, 147, 164);
+		panel.setBounds(20, 99, 147, 231);
 		settingpanel.add(panel);
 		panel.setLayout(null);
 		
@@ -194,27 +194,56 @@ public class UserInterface extends JFrame implements Observer{
 		maColor.setForeground(new Color(0, 0, 0));
 		maColor.setOpaque(true);
 		maColor.setBackground(Color.MAGENTA);
-		maColor.setBounds(94, 100, 26, 20);
+		maColor.setBounds(97, 100, 26, 20);
 		panel.add(maColor);
 		
-		JButton addbtn = new JButton("Add");
+		final JButton addbtn = new JButton("Add");
 		addbtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				controller.addMA(maMethod.getSelectedIndex(), Integer.parseInt(maPeriod.getSelectedItem().toString()), maColor.getBackground());
 			}
 		});
 		addbtn.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		addbtn.setBounds(10, 131, 53, 23);
+		addbtn.setBounds(40, 129, 53, 23);
 		panel.add(addbtn);
 		
-		JButton editbtn = new JButton("Edit");
-		editbtn.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		editbtn.addActionListener(new ActionListener() {
+		JButton deletebtn = new JButton("Delete");
+		deletebtn.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		deletebtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+		
+				controller.deletMA(maBox.getSelectedIndex());
+				
 			}
 		});
-		editbtn.setBounds(84, 131, 53, 23);
-		panel.add(editbtn);
+		deletebtn.setBounds(74, 163, 63, 23);
+		panel.add(deletebtn);
+		
+		JButton sellBuybtn = new JButton("Sell/Buy Data");
+		sellBuybtn.setBounds(20, 197, 110, 23);
+		panel.add(sellBuybtn);
+		sellBuybtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String s = controller.findSellBuyPoints();
+				if(s == null){
+					s = "No intersection points !!";
+				}
+				JFrame prediction = new JFrame("Prediction Points");
+				prediction.setLocationRelativeTo(addbtn);
+				prediction.setSize(350, 200);
+				JTextArea txt = new JTextArea();
+				txt.setText(s);
+				JScrollPane sp = new JScrollPane(txt);
+				sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+				prediction.add(sp);
+				prediction.setVisible(true);
+			}
+		});
+		sellBuybtn.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		
+		maBox = new JComboBox();
+		maBox.setBounds(10, 163, 53, 23);
+		panel.add(maBox);
 		
 		JButton drawbtn = new JButton("Draw");
 		drawbtn.addActionListener(new ActionListener() {
@@ -256,9 +285,21 @@ public class UserInterface extends JFrame implements Observer{
 	@Override
 	public void update(Observable o, Object arg) {
 
-		String[] stocksNames = model.getStocksNames();
-		stockName.setModel(new DefaultComboBoxModel(stocksNames));
-		currentStock.setText(model.getCurrentStock());
+		if(o instanceof StockMarketModel){ //add stock
+			String[] stocksNames = model.getStocksNames();
+			stockName.setModel(new DefaultComboBoxModel(stocksNames));
+			
+		}else if(o instanceof Stock){ // change current stock
+			currentStock.setText(model.getCurrentStock());
+			ArrayList<MovingAverage> m = ((Stock) o).getMovingAverages();
+			String[] maList = new String[m.size()];
+			for(int i=0 ; i<maList.length ; i++){
+				maList[i] = "MA/"+m.get(i).getPeriod();
+			}
+			maBox.setModel(new DefaultComboBoxModel(maList));
+		}
 		
 	}
+	
+	
 }

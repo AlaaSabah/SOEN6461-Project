@@ -19,12 +19,16 @@ public class StockMarketModel extends Observable{
 		observers.add(o);
 	}
 	
+	public ArrayList<Observer> getObservers(){
+		return observers;
+	}
+	
 	public void addStock(Stock s){
 		stocks.add(s);
 		if(stocks.size()==1){
 			setCurrentStock(s.getName());
 		}
-		notifyView();
+		notifyView(this);
 	}
 	
 	public String getCurrentStock(){
@@ -33,6 +37,7 @@ public class StockMarketModel extends Observable{
 	
 	public void setCurrentStock(String name){
 		currentstock = name;
+		notifyView(this.getStock(name));
 	}
 	
 	public Stock getStock(String StockName){
@@ -56,9 +61,9 @@ public class StockMarketModel extends Observable{
 		return stocks.size();
 	}
 	
-	public void notifyView(){
+	public void notifyView(Observable o){
 		for(int i=0 ; i<observers.size() ; i++){
-			observers.get(i).update(null, null);
+			observers.get(i).update(o, null);
 		}
 	}
 }

@@ -2,19 +2,28 @@ package model;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
-public class Stock {
+import view.UserInterface;
+
+public class Stock extends Observable{
 	
 	private ArrayList<String[]> info;
 	private ArrayList<MovingAverage> movingAverages;
 	private String name;
 	private Color color = Color.BLACK;
+	private ArrayList<Observer> observers;
 	
-	public Stock(String name, ArrayList<String[]> data){
+	
+	public Stock(String name, ArrayList<String[]> data, ArrayList<Observer> o){
 		this.name = name;
 		info = data;
 		movingAverages = new ArrayList<MovingAverage>();
+		observers = o;
 	}
+	
+	
 	
 	public String getName(){
 		return name;
@@ -42,6 +51,19 @@ public class Stock {
 	
 	public void addMA(MovingAverage ma){
 		movingAverages.add(ma);
+		notifyView(this);
+	}
+	
+	public void removeMA(int index){
+		movingAverages.remove(index);
+		notifyView(this);
+	}
+	
+	public void notifyView(Observable o){
+		for(int i=0 ; i<observers.size() ; i++){
+			observers.get(i).update(o, null);
+		}
 	}
 
+	
 }

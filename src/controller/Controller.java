@@ -66,7 +66,8 @@ public class Controller {
 				try {
 					reader = new CSVFileReader();
 					a = reader.readAll(new FileReader(selectedFile.getAbsolutePath()));
-					model.addStock(new Stock("Stock"+(model.getSize()+1),(ArrayList<String[]>)a));
+					model.addStock(new Stock("Stock"+(model.getSize()+1),(ArrayList<String[]>)a, model.getObservers()));
+					
 					
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -106,4 +107,13 @@ public class Controller {
 		model.getStock(model.getCurrentStock()).addMA(ma);
 	}
 
+	public void deletMA(int index){
+		model.getStock(model.getCurrentStock()).removeMA(index);
+	}
+	
+	public String findSellBuyPoints(){
+		maCalculator = new SimpleMACalculator();
+		String points = maCalculator.findSBPoints(model.getStock(model.getCurrentStock()));
+		return points;
+	}
 }

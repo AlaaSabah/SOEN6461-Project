@@ -8,4 +8,5 @@ import model.Stock;
 public interface MACalculator {
 
 	public MovingAverage calculate(Stock stock, int period , Color c);
+	public String findSBPoints(Stock s);
 }
