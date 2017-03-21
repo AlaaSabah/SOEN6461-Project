@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-public class StockMarketModel extends Observable{
+public class StockMarketModelSubject extends Observable{
 	
-	private ArrayList<Stock> stocks;
+	private ArrayList<StockSubject> stocks;
 	private ArrayList<Observer> observers;
 	private String currentstock;
 	
-	public StockMarketModel(){
-		stocks = new ArrayList<Stock>();
+	public StockMarketModelSubject(){
+		stocks = new ArrayList<StockSubject>();
 		observers = new ArrayList<Observer>();
 	}
 
@@ -23,7 +23,7 @@ public class StockMarketModel extends Observable{
 		return observers;
 	}
 	
-	public void addStock(Stock s){
+	public void addStock(StockSubject s){
 		stocks.add(s);
 		if(stocks.size()==1){
 			setCurrentStock(s.getName());
@@ -40,7 +40,7 @@ public class StockMarketModel extends Observable{
 		notifyView(this.getStock(name));
 	}
 	
-	public Stock getStock(String StockName){
+	public StockSubject getStock(String StockName){
 		for(int i=0 ; i<stocks.size() ; i++){
 			if(stocks.get(i).getName().equals(StockName)){
 				return stocks.get(i);
@@ -61,7 +61,7 @@ public class StockMarketModel extends Observable{
 		return stocks.size();
 	}
 	
-	public void notifyView(Observable o){
+	private void notifyView(Observable o){
 		for(int i=0 ; i<observers.size() ; i++){
 			observers.get(i).update(o, null);
 		}

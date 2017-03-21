@@ -25,8 +25,8 @@ import org.jfree.chart.ChartPanel;
 
 import controller.Controller;
 import model.MovingAverage;
-import model.Stock;
-import model.StockMarketModel;
+import model.StockSubject;
+import model.StockMarketModelSubject;
 
 import java.awt.Color;
 import javax.swing.UIManager;
@@ -43,17 +43,17 @@ import javax.swing.SwingConstants;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class UserInterface extends JFrame implements Observer{
+public class UserInterfaceObserver extends JFrame implements Observer{
 
 	private JPanel contentPane;
 	private Controller controller;
-	private StockMarketModel model;
+	private StockMarketModelSubject model;
 	private JComboBox stockName;
 	private JLabel currentStock;
 	private JComboBox maBox;
 	JPanel dataPanel;
 	
-	public void addControllerandModel(Controller c, StockMarketModel m){
+	public void registerMe(Controller c, StockMarketModelSubject m){
 		controller = c;
 		model = m;
 		model.addObservers(this);
@@ -66,7 +66,7 @@ public class UserInterface extends JFrame implements Observer{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					UserInterface frame = new UserInterface();
+					UserInterfaceObserver frame = new UserInterfaceObserver();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -78,7 +78,7 @@ public class UserInterface extends JFrame implements Observer{
 	/**
 	 * Create the frame.
 	 */
-	public UserInterface() {
+	public UserInterfaceObserver() {
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 973, 630);
@@ -295,14 +295,14 @@ public class UserInterface extends JFrame implements Observer{
 	@Override
 	public void update(Observable o, Object arg) {
 
-		if(o instanceof StockMarketModel){ //add stock
+		if(o instanceof StockMarketModelSubject){ //add stock
 			String[] stocksNames = model.getStocksNames();
 			stockName.setModel(new DefaultComboBoxModel(stocksNames));
 			
 			
-		}else if(o instanceof Stock){ // change current stock
+		}else if(o instanceof StockSubject){ // change current stock
 			currentStock.setText(model.getCurrentStock());
-			ArrayList<MovingAverage> m = ((Stock) o).getMovingAverages();
+			ArrayList<MovingAverage> m = ((StockSubject) o).getMovingAverages();
 			String[] maList = new String[m.size()];
 			for(int i=0 ; i<maList.length ; i++){
 				maList[i] = "MA/"+m.get(i).getPeriod();

@@ -4,11 +4,11 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import model.MovingAverage;
-import model.Stock;
+import model.StockSubject;
 
 public class SimpleMACalculator implements MACalculator{
 
-	public MovingAverage calculate(Stock stock, int period , Color c){
+	public MovingAverage calculate(StockSubject stock, int period , Color c){
 		
 		ArrayList<String[]> a = stock.getInfo();
 		ArrayList<String[]> maData = new ArrayList<String[]>();
@@ -27,7 +27,7 @@ public class SimpleMACalculator implements MACalculator{
 	}
 
 	@Override
-	public String findSBPoints(Stock s) {
+	public String findSBPoints(StockSubject s) {
 		
 		ArrayList<MovingAverage> ma = s.getMovingAverages();
 		MovingAverage least = ma.get(0);
@@ -46,13 +46,13 @@ public class SimpleMACalculator implements MACalculator{
 		return ss;
 	}
 	
-	public void print(MovingAverage least, MovingAverage most){
-		int size = Math.min(least.getData().size(), most.getData().size());
-		
-		for(int i=0 ; i<700 ; i++){
-			System.out.println((least.getData().get(i))[0]+">>>"+(least.getData().get(i))[1]+"		"+(most.getData().get(i))[0]+">>>"+(most.getData().get(i))[1]);
-		}
-	}
+//	public void print(MovingAverage least, MovingAverage most){
+//		int size = Math.min(least.getData().size(), most.getData().size());
+//		
+//		for(int i=0 ; i<700 ; i++){
+//			System.out.println((least.getData().get(i))[0]+">>>"+(least.getData().get(i))[1]+"		"+(most.getData().get(i))[0]+">>>"+(most.getData().get(i))[1]);
+//		}
+//	}
 
 
 	private String intersectionPoints(MovingAverage least, MovingAverage most) {

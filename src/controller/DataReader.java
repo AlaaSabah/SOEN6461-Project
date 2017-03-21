@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface DataReader {
 
-	List readAll(FileReader reader);
+	List readAll();
 
 }

@@ -13,29 +13,29 @@ import javax.swing.JOptionPane;
 import org.jfree.chart.ChartPanel;
 
 import model.MovingAverage;
-import model.Stock;
-import model.StockMarketModel;
+import model.StockSubject;
+import model.StockMarketModelSubject;
 import view.LoginPage;
-import view.UserInterface;
+import view.UserInterfaceObserver;
 
 public class Controller {
 	
-	private LoginPage login;
-	private StockMarketModel model;
+	//private LoginPage login;
+	private StockMarketModelSubject model;
 	private DataReader reader;
 	private ChartDrawer drawer;
 	private MACalculator maCalculator;
-	UserInterface user;
+	UserInterfaceObserver user;
 	
-	public Controller(LoginPage login, StockMarketModel model){
+	public Controller(StockMarketModelSubject model){
 		
-		this.login = login;
+		//this.login = login;
 		this.model = model;
 		drawer = new ChartDrawer();
 		
 	}
 	
-	public void addUserInterface(UserInterface ui){
+	public void addUserInterface(UserInterfaceObserver ui){
 		user = ui;
 	}
 	
@@ -49,36 +49,18 @@ public class Controller {
 	public void readData(boolean selected){
 		if(selected){
 			
-			JFileChooser fileChooser = new JFileChooser();
-			fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-			int result = fileChooser.showOpenDialog(user);
+			reader = new CSVFileReader();
+			List a = reader.readAll();
 			
-			if (result == JFileChooser.APPROVE_OPTION) {
-				
-			    File selectedFile = fileChooser.getSelectedFile();
-			    
-			    if(!selectedFile.getAbsolutePath().substring(selectedFile.getAbsolutePath().length()-4).equals(".csv")){
-			    	JOptionPane.showMessageDialog(null, "Wrong file type. Please select csv file !!","ERROR", JOptionPane.ERROR_MESSAGE);
-			    	return;
-			    }
-			    
-				List a=null;
-				try {
-					reader = new CSVFileReader();
-					a = reader.readAll(new FileReader(selectedFile.getAbsolutePath()));
-					model.addStock(new Stock("Stock"+(model.getSize()+1),(ArrayList<String[]>)a, model.getObservers()));
-					
-					
-				} catch (IOException e) {
-					e.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Failed to read the file. Please try again !","ERROR", JOptionPane.ERROR_MESSAGE);
-				}
-				
-				
+			if(a != null){
+				model.addStock(new StockSubject("Stock"+(model.getSize()+1),(ArrayList<String[]>)a, model.getObservers()));
 				JOptionPane.showMessageDialog(null, "File was successfully read !.","Done", JOptionPane.INFORMATION_MESSAGE);
 			}
+			
+			
 		}
 	}
+	
 
 
 	public ChartPanel drawStock(int selection){

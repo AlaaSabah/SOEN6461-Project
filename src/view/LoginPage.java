@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
-import model.StockMarketModel;
+import model.StockMarketModelSubject;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,7 +27,7 @@ public class LoginPage extends JFrame {
 	private JTextField passTxt;
 	private LoginPage login = this ;
     private Controller controller;
-    private StockMarketModel model;
+    private StockMarketModelSubject model;
 
 	/**
 	 * Launch the application.
@@ -49,7 +49,7 @@ public class LoginPage extends JFrame {
 		controller = c;
 	}
 	
-	public void addModel(StockMarketModel m){
+	public void addModel(StockMarketModelSubject m){
 		model = m;
 	}
 
@@ -97,8 +97,8 @@ public class LoginPage extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				boolean b = controller.authorizeUser(nameTxt.getText(), passTxt.getText());
 				if(b){
-					UserInterface user = new UserInterface();
-					user.addControllerandModel(controller,model);
+					UserInterfaceObserver user = new UserInterfaceObserver();
+					user.registerMe(controller,model);
 					
 					controller.addUserInterface(user);
 					user.setVisible(true);

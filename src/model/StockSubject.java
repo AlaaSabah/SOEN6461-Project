@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-import view.UserInterface;
+import view.UserInterfaceObserver;
 
-public class Stock extends Observable{
+public class StockSubject extends Observable{
 	
 	private ArrayList<String[]> info;
 	private ArrayList<MovingAverage> movingAverages;
@@ -16,7 +16,7 @@ public class Stock extends Observable{
 	private ArrayList<Observer> observers;
 	
 	
-	public Stock(String name, ArrayList<String[]> data, ArrayList<Observer> o){
+	public StockSubject(String name, ArrayList<String[]> data, ArrayList<Observer> o){
 		this.name = name;
 		info = data;
 		movingAverages = new ArrayList<MovingAverage>();

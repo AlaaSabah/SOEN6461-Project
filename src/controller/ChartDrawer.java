@@ -13,11 +13,11 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import model.Stock;
+import model.StockSubject;
 
 public class ChartDrawer {
 	
-public DefaultCategoryDataset createDataset(Stock s, int range){
+private DefaultCategoryDataset createDataset(StockSubject s, int range){
 		
 		DefaultCategoryDataset dataset= new DefaultCategoryDataset();
 		ArrayList<String[]> a = s.getInfo();
@@ -54,7 +54,7 @@ public DefaultCategoryDataset createDataset(Stock s, int range){
 		return dataset;
 	}
 
-public DefaultCategoryDataset createDataset(Stock s){
+private DefaultCategoryDataset createDataset(StockSubject s){
 	
 	DefaultCategoryDataset dataset= new DefaultCategoryDataset();
 	ArrayList<String[]> a = s.getInfo();
@@ -113,7 +113,7 @@ private String calculateDateRange(int range, String last) {
 }
 
 
-public ChartPanel draw(Stock stock , int range){
+public ChartPanel draw(StockSubject stock , int range){
 	DefaultCategoryDataset dataset;
 	if(range == -1){
 		dataset = createDataset(stock);
