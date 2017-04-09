@@ -33,6 +33,15 @@ public class StockSubject extends Observable{
 		return info;
 	}
 	
+	public void setInfo(ArrayList<String[]> a){
+		info = a;
+		int x=movingAverages.size();
+		for(int i = 0 ; i< x ; i++){
+			removeMA(0);
+		}
+		
+	}
+	
 	public Color getColor(){
 		return color;
 	}

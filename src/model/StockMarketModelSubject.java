@@ -9,10 +9,15 @@ public class StockMarketModelSubject extends Observable{
 	private ArrayList<StockSubject> stocks;
 	private ArrayList<Observer> observers;
 	private String currentstock;
+	private String[] stocksList;
+	private int count = 30;
 	
 	public StockMarketModelSubject(){
 		stocks = new ArrayList<StockSubject>();
 		observers = new ArrayList<Observer>();
+		stocksList = new String[]{"Dow 30 Stocks", "MMM", "AXP", "AAPL", "BA", "CAT", "CVX", "CSCO", "KO", "DD", "XOM",
+				"GE", "GS", "HD", "IBM", "INTC", "JNJ", "JPM", "MCD", "MRK", "MSFT", "NKE", "PFE", "PG", "TRV", "UNH", "UTX",
+				"VZ", "V", "WMT", "DIS", "CSV Files"};
 	}
 
 	public void addObservers(Observer o){
@@ -23,12 +28,21 @@ public class StockMarketModelSubject extends Observable{
 		return observers;
 	}
 	
-	public void addStock(StockSubject s){
-		stocks.add(s);
-		if(stocks.size()==1){
-			setCurrentStock(s.getName());
+	public void addStock(StockSubject s, boolean updateList){
+		if(!updateList){
+			if(this.getStock(s.getName())==null){
+				stocks.add(s);
+			}
+			else{
+				this.getStock(s.getName()).setInfo(s.getInfo());
+			}
 		}
-		notifyView(this);
+		else{
+			stocks.add(s);
+			updateStocksList(s);
+		}
+		
+		setCurrentStock(s.getName());	
 	}
 	
 	public String getCurrentStock(){
@@ -65,5 +79,25 @@ public class StockMarketModelSubject extends Observable{
 		for(int i=0 ; i<observers.size() ; i++){
 			observers.get(i).update(o, null);
 		}
+	}
+
+	public String[] getStocksList() {
+		return stocksList;
+	}
+	
+	public int getCount(){
+		count++;
+		return count;
+	}
+
+	public void updateStocksList(StockSubject s) {
+		System.out.println(stocksList.length);
+		String[] a = new String[stocksList.length+1];
+		for(int i=0 ; i<stocksList.length ; i++){
+			a[i] = stocksList[i];
+		}
+		a[a.length-1] = s.getName();	
+		stocksList = a;
+		notifyView(this);
 	}
 }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ButtonModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -46,18 +47,42 @@ public class Controller {
 		return false;
 	}
 
-	public void readData(boolean selected){
-		if(selected){
+	public void readData(String selected, int range){
+		
+		List a = null;
+		if(selected.equals("CSV File")){
 			
 			reader = new CSVFileReader();
-			List a = reader.readAll();
+			a = reader.readAll();
 			
 			if(a != null){
-				model.addStock(new StockSubject("Stock"+(model.getSize()+1),(ArrayList<String[]>)a, model.getObservers()));
-				JOptionPane.showMessageDialog(null, "File was successfully read !.","Done", JOptionPane.INFORMATION_MESSAGE);
+				model.addStock(new StockSubject("Stock"+model.getCount(),(ArrayList<String[]>)a, model.getObservers()), true);
+				
+			}
+		}else if(selected.equals("YahooFinance")){
+			
+			int r=0;
+			switch(range){
+			case 0 : r = -1;break;
+			case 1 : r = 3;break;
+			case 2 : r = 6;break;
+			case 3 : r = 1; break;
+			case 4 : r = 2;break;
+			}
+			reader = new Dow30Reader(model.getCurrentStock(), r);
+			a = reader.readAll();
+			if(a != null){
+				model.addStock(new StockSubject(model.getCurrentStock(),(ArrayList<String[]>)a, model.getObservers()), false);
+				
 			}
 			
-			
+		}
+		
+		if(a == null){
+			JOptionPane.showMessageDialog(null, "Failed to read data !!.","Error", JOptionPane.INFORMATION_MESSAGE);
+		}
+		else{
+			JOptionPane.showMessageDialog(null, "File was successfully read !.","Done", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 	

@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.JLabel;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -48,15 +49,17 @@ public class UserInterfaceObserver extends JFrame implements Observer{
 	private JPanel contentPane;
 	private Controller controller;
 	private StockMarketModelSubject model;
-	private JComboBox stockName;
+	private JComboBox stockList;
 	private JLabel currentStock;
 	private JComboBox maBox;
-	JPanel dataPanel;
+	private JPanel dataPanel;
+	private final JComboBox range;
 	
 	public void registerMe(Controller c, StockMarketModelSubject m){
 		controller = c;
 		model = m;
 		model.addObservers(this);
+		stockList.setModel(new DefaultComboBoxModel(model.getStocksList()));
 	}
 
 	/**
@@ -111,17 +114,31 @@ public class UserInterfaceObserver extends JFrame implements Observer{
 		csvFile.setBounds(6, 27, 75, 23);
 		readpanel.add(csvFile);
 		
+		final JRadioButton yahooStock = new JRadioButton("YahooFinance");
+		yahooStock.setSelected(false);
+		yahooStock.setOpaque(false);
+		yahooStock.setBounds(84, 27, 98, 23);
+		readpanel.add(yahooStock);
+		
+		final ButtonGroup group = new ButtonGroup();
+		group.add(csvFile);
+		group.add(yahooStock);
+		
 		JButton readbtn = new JButton("Get Data");
 		readbtn.setBounds(53, 68, 81, 23);
 		readbtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller.readData(csvFile.isSelected());
+				String text = "";
+				if(csvFile.isSelected())
+					text = csvFile.getText();
+				else
+					text = yahooStock.getText();
+				controller.readData(text, range.getSelectedIndex());
 			}
 		});
 		readpanel.setLayout(null);
 		readpanel.add(readbtn);
 		readbtn.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		
 		
 		JPanel settingpanel = new JPanel();
 		settingpanel.setBorder(new TitledBorder(border, "Settings", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 0, 0)));
@@ -136,22 +153,23 @@ public class UserInterfaceObserver extends JFrame implements Observer{
 		lblStock.setBounds(20, 23, 46, 17);
 		settingpanel.add(lblStock);
 		
-		stockName = new JComboBox();
-		stockName.addActionListener(new ActionListener() {
+		stockList = new JComboBox();
+		stockList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller.changeCurrentStock(stockName.getSelectedItem().toString());
-				currentStock.setText(model.getCurrentStock());
+				if(stockList.getSelectedIndex() != 0 && stockList.getSelectedIndex() != 31){
+					controller.changeCurrentStock(stockList.getSelectedItem().toString());
+				}	
 			}
 		});
-		stockName.setBounds(76, 22, 89, 20);
-		settingpanel.add(stockName);
+		stockList.setBounds(65, 22, 113, 20);
+		settingpanel.add(stockList);
 		
 		JLabel lblNewLabel_1 = new JLabel("Data Range");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblNewLabel_1.setBounds(20, 62, 81, 14);
 		settingpanel.add(lblNewLabel_1);
 		
-		final JComboBox range = new JComboBox();
+		range = new JComboBox();
 		range.setModel(new DefaultComboBoxModel(new String[] {"All", "3 months", "6 months", "1 year", "2 years"}));
 		range.setBounds(96, 60, 69, 20);
 		settingpanel.add(range);
@@ -295,30 +313,33 @@ public class UserInterfaceObserver extends JFrame implements Observer{
 	@Override
 	public void update(Observable o, Object arg) {
 
-		if(o instanceof StockMarketModelSubject){ //add stock
-			String[] stocksNames = model.getStocksNames();
-			stockName.setModel(new DefaultComboBoxModel(stocksNames));
+		if(o instanceof StockMarketModelSubject){ //update stocks list
+			String[] stocksNames = model.getStocksList();
+			stockList.setModel(new DefaultComboBoxModel(stocksNames));
+			stockList.setSelectedIndex(stocksNames.length-1);
 			
+		}
+		else if(o instanceof StockSubject){ // set current stock
 			
-		}else if(o instanceof StockSubject){ // change current stock
-			currentStock.setText(model.getCurrentStock());
-			ArrayList<MovingAverage> m = ((StockSubject) o).getMovingAverages();
+			currentStock.setText(((StockSubject) o).getName());// name label
+			ArrayList<MovingAverage> m = ((StockSubject) o).getMovingAverages();// MA list
 			String[] maList = new String[m.size()];
 			for(int i=0 ; i<maList.length ; i++){
 				maList[i] = "MA/"+m.get(i).getPeriod();
 			}
 			maBox.setModel(new DefaultComboBoxModel(maList));
-			String[][] data = new String[model.getStock(model.getCurrentStock()).getInfo().size()-1][7];
+			
+			String[][] data = new String[((StockSubject) o).getInfo().size()-1][7];// data table
+			
 			for(int i=1 ; i<model.getStock(model.getCurrentStock()).getInfo().size() ; i++){
 				data[i-1] = model.getStock(model.getCurrentStock()).getInfo().get(i); 
 			}
-			JTable table = new JTable(data, model.getStock(model.getCurrentStock()).getInfo().get(0));
+			
+			JTable table = new JTable(data, ((StockSubject) o).getInfo().get(0));
 			dataPanel.removeAll();
 			dataPanel.add(new JScrollPane(table));
 			dataPanel.revalidate();
 		}
 		
 	}
-	
-	
 }
