@@ -8,8 +8,10 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.ComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -43,6 +45,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingConstants;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.ScrollPaneConstants;
 
 public class UserInterfaceObserver extends JFrame implements Observer{
 
@@ -54,11 +57,13 @@ public class UserInterfaceObserver extends JFrame implements Observer{
 	private JComboBox maBox;
 	private JPanel dataPanel;
 	private final JComboBox range;
+	private final JPanel watchPanel;
 	
 	public void registerMe(Controller c, StockMarketModelSubject m){
 		controller = c;
 		model = m;
 		model.addObservers(this);
+		stockList = new JComboBox();
 		stockList.setModel(new DefaultComboBoxModel(model.getStocksList()));
 	}
 
@@ -69,8 +74,8 @@ public class UserInterfaceObserver extends JFrame implements Observer{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					UserInterfaceObserver frame = new UserInterfaceObserver();
-					frame.setVisible(true);
+//					UserInterfaceObserver frame = new UserInterfaceObserver();
+//					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -81,10 +86,20 @@ public class UserInterfaceObserver extends JFrame implements Observer{
 	/**
 	 * Create the frame.
 	 */
-	public UserInterfaceObserver() {
+	public UserInterfaceObserver(Controller c, StockMarketModelSubject m) {
+		registerMe(c, m);
+		
+		watchPanel = new JPanel();
+		watchPanel.setBorder(new LineBorder(new Color(0, 0, 0), 2));
+		watchPanel.setLayout(new BorderLayout());
+		watchPanel.setOpaque(false);
+		watchPanel.setBounds(967, 159, 177, 271);
+		
+		String[][] watchData = controller.createWatchList(null);
+		updateWatchPanel(watchData);
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 973, 630);
+		setBounds(100, 100, 1160, 630);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -153,7 +168,7 @@ public class UserInterfaceObserver extends JFrame implements Observer{
 		lblStock.setBounds(20, 23, 46, 17);
 		settingpanel.add(lblStock);
 		
-		stockList = new JComboBox();
+		
 		stockList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(stockList.getSelectedIndex() != 0 && stockList.getSelectedIndex() != 31){
@@ -304,10 +319,96 @@ public class UserInterfaceObserver extends JFrame implements Observer{
 		lblNewLabel_2.setBounds(357, 23, 478, 62);
 		contentPane.add(lblNewLabel_2);
 		
+		JLabel lblWatchList = new JLabel("Watch List");
+		lblWatchList.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblWatchList.setBounds(1000, 113, 112, 27);
+		contentPane.add(lblWatchList);
+		
+		contentPane.add(watchPanel);
+		
+		final JComboBox dowList = new JComboBox();
+		dowList.setBounds(980, 457, 89, 20);
+		String [] list = new String[]{"MMM", "AXP", "AAPL", "BA", "CAT", "CVX", "CSCO", "KO", "DD", "XOM",
+				"GE", "GS", "HD", "IBM", "INTC", "JNJ", "JPM", "MCD", "MRK", "MSFT", "NKE", "PFE", "PG", "TRV", "UNH", "UTX",
+				"VZ", "V", "WMT", "DIS"};
+		dowList.setModel(new DefaultComboBoxModel(list));
+		contentPane.add(dowList);
+	
+		final JComboBox watchList = new JComboBox();
+		watchList.setBounds(980, 491, 89, 20);
+		contentPane.add(watchList);
+		
+		JButton addToWatch = new JButton("Add");
+		addToWatch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				watchList.addItem(dowList.getSelectedItem());
+			}
+		});
+		addToWatch.setBounds(1079, 456, 65, 23);
+		contentPane.add(addToWatch);
+		
+		
+		JButton removeFromWatch = new JButton("Delete");
+		removeFromWatch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(watchList.getSelectedIndex()>=0)
+				watchList.removeItemAt(watchList.getSelectedIndex());
+			}
+		});
+		removeFromWatch.setBounds(1079, 488, 65, 23);
+		contentPane.add(removeFromWatch);
+		
+		JButton btnCreate = new JButton("Create");
+		btnCreate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(watchList.getSelectedIndex()>=0){
+					ComboBoxModel model = watchList.getModel();
+					int size = model.getSize();
+					String[] list = new String[size];
+					for(int i=0 ; i<size ; i++){
+						list[i] = (String)model.getElementAt(i);
+					}
+					String[][] watchData = controller.createWatchList(list);
+					updateWatchPanel(watchData);
+				}
+			}
+		});
+		btnCreate.setBounds(1023, 532, 89, 23);
+		contentPane.add(btnCreate);
+		
 		JLabel lblNewLabel = new JLabel("New label");
-		lblNewLabel.setIcon(new ImageIcon("C:\\Users\\alaa\\Desktop\\Master\\EclipseProjects\\SOEN6461Project\\src\\images\\bg 8.jpg"));
-		lblNewLabel.setBounds(0, 0, 977, 601);
+		lblNewLabel.setBounds(0, 0, 1173, 624);
 		contentPane.add(lblNewLabel);
+		lblNewLabel.setIcon(new ImageIcon("C:\\Users\\alaa\\Desktop\\Master\\EclipseProjects\\SOEN6461Project\\src\\images\\bg 8.jpg"));
+	}
+	
+	private void updateWatchPanel(String[][] data){
+		if(data == null){
+			return;
+		}
+		
+		JPanel p = new JPanel();
+		p.setLayout(new GridLayout(0,1,3,3));
+		JLabel[] labels = new JLabel[data.length];
+		
+		for(int i= 0 ; i<labels.length ; i++){
+			if(data[i][1].equals("sell")){
+				labels[i] = new JLabel(data[i][0]+"          ", new ImageIcon("src\\images\\up.png"), JLabel.RIGHT);
+			}else {
+				labels[i] = new JLabel(data[i][0]+"          ", new ImageIcon("src\\images\\down.png"), JLabel.RIGHT);	
+			}
+			labels[i].setFont(new Font("Tahoma", Font.BOLD, 18));
+			labels[i].setHorizontalTextPosition(SwingConstants.LEFT);
+			p.add(labels[i]);
+		}
+		
+		JScrollPane scrollPane = new JScrollPane(p);
+		scrollPane.setBackground(Color.WHITE);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		watchPanel.removeAll();
+		watchPanel.add(scrollPane, BorderLayout.CENTER);
+		watchPanel.revalidate();
+		
 	}
 
 	@Override

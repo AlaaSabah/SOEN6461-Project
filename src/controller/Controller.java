@@ -133,4 +133,9 @@ public class Controller {
 		}
 		return new String("Nothing to display");
 	}
+	
+	public String[][] createWatchList(String[] list){
+		WatchListManager manager = new WatchListManager();
+		return manager.updateWatchList(list);
+	}
 }

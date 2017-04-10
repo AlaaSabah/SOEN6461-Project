@@ -69,6 +69,7 @@ public class StockSubject extends Observable{
 	}
 	
 	public void notifyView(Observable o){
+		if(observers != null)
 		for(int i=0 ; i<observers.size() ; i++){
 			observers.get(i).update(o, null);
 		}

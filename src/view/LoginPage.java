@@ -97,9 +97,7 @@ public class LoginPage extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				boolean b = controller.authorizeUser(nameTxt.getText(), passTxt.getText());
 				if(b){
-					UserInterfaceObserver user = new UserInterfaceObserver();
-					user.registerMe(controller,model);
-					
+					UserInterfaceObserver user = new UserInterfaceObserver(controller,model);
 					controller.addUserInterface(user);
 					user.setVisible(true);
 					login.setVisible(false);

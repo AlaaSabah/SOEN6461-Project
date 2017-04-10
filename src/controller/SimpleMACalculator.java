@@ -12,8 +12,9 @@ public class SimpleMACalculator implements MACalculator{
 		
 		ArrayList<String[]> a = stock.getInfo();
 		ArrayList<String[]> maData = new ArrayList<String[]>();
-		double sum = 0;
+		double sum = 0.0;
 		for(int i=1 ; i<a.size()-period+1 ; i++){
+			sum=0.0;
 			maData.add(new String[2]);
 			(maData.get(i-1))[0] = (a.get(i))[0]; 
 			for(int j=0 ; j<period ; j++){
@@ -41,61 +42,69 @@ public class SimpleMACalculator implements MACalculator{
 		
 		if(least.getPeriod() == most.getPeriod())
 			return null;
-		String ss = intersectionPoints(least, most);
-		//print(least,most);
-		return ss;
+		ArrayList<Integer> points = intersectionPoints(least, most, 5);
+		if(points.size()>0)
+			return predictionStatement(least, points);
+		return "No intersection points between the moving averages !";
 	}
 	
-//	public void print(MovingAverage least, MovingAverage most){
-//		int size = Math.min(least.getData().size(), most.getData().size());
-//		
-//		for(int i=0 ; i<700 ; i++){
-//			System.out.println((least.getData().get(i))[0]+">>>"+(least.getData().get(i))[1]+"		"+(most.getData().get(i))[0]+">>>"+(most.getData().get(i))[1]);
-//		}
-//	}
 
 
-	private String intersectionPoints(MovingAverage least, MovingAverage most) {
+
+	public ArrayList<Integer> intersectionPoints(MovingAverage least, MovingAverage most, int noOfPoints) {
 		
 		int size = Math.min(least.getData().size(), most.getData().size());
 		ArrayList<Integer> p = new ArrayList<Integer>();
 		String s="Sell/Buy predictions are as following in the previous period:\n";
 		
-		for(int i=1 ; i<size ; i++){
+		for(int i=2 ; i<size ; i++){
+			if(p.size() == noOfPoints)
+				break;
 			if((int)(Double.parseDouble((least.getData().get(i))[1])+0.5) == (int)(Double.parseDouble((most.getData().get(i))[1])+0.5)){
+				
 				if(p.size() == 0)
 				p.add(i);
 				else{
-					if(Math.abs(p.get(p.size()-1)-i) > 30)
+					if(Math.abs(p.get(p.size()-1)-i) > 25)
 						p.add(i);
 				}
 			}
 		}
 		
-		int numP=p.size();
-		if(numP > 5)
-			numP = 5;
-		for(int i=0 ; i<numP ; i++){
+		return p;	
+	}
+	
+	public String predictionStatement(MovingAverage least, ArrayList<Integer> points){
+		
+		String statement="Sell/Buy predictions are as following in the previous period:\n";
+		statement+="In the period "+(least.getData().get(points.get(0)))[0]+" up to now, you should "+getPrediction(least, points.get(0))+"\n";
+        for(int i=1 ; i<points.size() ; i++)
+        	statement+="In the period "+(least.getData().get(points.get(i)))[0]+" to "+(least.getData().get(points.get(i-1)))[0]+", you should "+getPrediction(least, points.get(i))+"\n";
+        
+        return statement;
+
+	}
+	
+	public String getPrediction(MovingAverage least, int index){
+		int x = 5;
+		if(index<5)
+			x =index-1;
+		if(index+5 > least.getData().size()-1)
+			x = least.getData().size()-1-index;
+		if(Double.parseDouble((least.getData().get(index+x))[1]) < Double.parseDouble((least.getData().get(index))[1]) ||
+				Double.parseDouble((least.getData().get(index-x))[1]) > Double.parseDouble((least.getData().get(index))[1])){
 			
-			if(Double.parseDouble((least.getData().get(p.get(i)+1))[1]) < Double.parseDouble((least.getData().get(p.get(i)))[1]) &&
-					Double.parseDouble((least.getData().get(p.get(i)-1))[1]) > Double.parseDouble((least.getData().get(p.get(i)))[1])){
-				
-				if(i == 0){
-					s+="In the period "+(least.getData().get(p.get(i)))[0]+" up to now, you should sell\n";
-				}else
-					s+="In the period "+(least.getData().get(p.get(i)))[0]+" to "+(least.getData().get(p.get(i-1)))[0]+", you should sell\n";
+				return "sell";
+		
+		}else if(Double.parseDouble((least.getData().get(index+x))[1]) > Double.parseDouble((least.getData().get(index))[1]) ||
+				Double.parseDouble((least.getData().get(index-x))[1]) < Double.parseDouble((least.getData().get(index))[1])){
 			
-			}else if(Double.parseDouble((least.getData().get(p.get(i)+1))[1]) > Double.parseDouble((least.getData().get(p.get(i)))[1]) &&
-					Double.parseDouble((least.getData().get(p.get(i)-1))[1]) < Double.parseDouble((least.getData().get(p.get(i)))[1])){
-				
-				if(i == 0){
-					s+="In the period "+(least.getData().get(p.get(i)))[0]+" up to now, you should buy\n";
-				}else
-					s+="In the period "+(least.getData().get(p.get(i)))[0]+" to "+(least.getData().get(p.get(i-1)))[0]+", you should buy\n";
-			}
-			
-		}
-		return s;
+			return "buy";
+		}else if(Double.parseDouble((least.getData().get(index-5))[1]) > Double.parseDouble((least.getData().get(index))[1])){
+			return "sell";
+		}else
+			return "buy";
+		
 	}
 	
 }
